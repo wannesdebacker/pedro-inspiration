@@ -27,46 +27,43 @@ const QuoteSlideshow = () => {
     []
   );
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const filteredQuotes = useMemo(
+    () => data.filter((quote) => !quote.startsWith('@')),
+    []
+  );
+
+  const [currentIndex, setCurrentIndex] = useState(() =>
+    Math.floor(Math.random() * filteredQuotes.length)
+  );
   const [isPlaying, setIsPlaying] = useState(true);
-  const [showAtReplies, setShowAtReplies] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentBgImage, setCurrentBgImage] = useState(
     () =>
       BACKGROUND_IMAGES[Math.floor(Math.random() * BACKGROUND_IMAGES.length)]
   );
 
-  const filteredQuotes = showAtReplies
-    ? data
-    : data.filter((quote) => !quote.startsWith('@'));
-
   const currentQuote = filteredQuotes[currentIndex] || '';
 
   const nextSlide = useCallback(() => {
-    let randomIndex;
-    do {
-      randomIndex = Math.floor(Math.random() * filteredQuotes.length);
-    } while (randomIndex === currentIndex && filteredQuotes.length > 1);
-
-    setCurrentIndex(randomIndex);
+    setCurrentIndex((prevIndex) => {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * filteredQuotes.length);
+      } while (randomIndex === prevIndex && filteredQuotes.length > 1);
+      return randomIndex;
+    });
     setProgress(0);
-  }, [filteredQuotes.length, currentIndex]);
+  }, [filteredQuotes.length]);
 
-  const randomSlide = () => {
+  const randomSlide = useCallback(() => {
     const randomIndex = Math.floor(Math.random() * filteredQuotes.length);
     setCurrentIndex(randomIndex);
     setProgress(0);
-  };
+  }, [filteredQuotes.length]);
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  const toggleAtReplies = () => {
-    setShowAtReplies(!showAtReplies);
-    setCurrentIndex(0);
-    setProgress(0);
-  };
+  const togglePlay = useCallback(() => {
+    setIsPlaying((prev) => !prev);
+  }, []);
 
   useEffect(() => {
     const bgInterval = setInterval(() => {
@@ -76,7 +73,7 @@ const QuoteSlideshow = () => {
     }, BACKGROUND_CHANGE_DURATION);
 
     return () => clearInterval(bgInterval);
-  }, [BACKGROUND_CHANGE_DURATION, BACKGROUND_IMAGES]);
+  }, [BACKGROUND_IMAGES, BACKGROUND_CHANGE_DURATION]);
 
   useEffect(() => {
     if (!isPlaying) return;
@@ -92,7 +89,7 @@ const QuoteSlideshow = () => {
     }, SLIDE_DURATION / 100);
 
     return () => clearInterval(interval);
-  }, [isPlaying, nextSlide]);
+  }, [isPlaying, nextSlide, SLIDE_DURATION]);
 
   return (
     <div className="slideshow">
@@ -124,14 +121,6 @@ const QuoteSlideshow = () => {
           aria-label="Random quote"
         >
           <Icon name="reload" />
-        </button>
-
-        <button
-          className={`slideshow__button ${!showAtReplies ? 'slideshow__button--active' : ''}`}
-          onClick={toggleAtReplies}
-          aria-label="Toggle @ replies"
-        >
-          <Icon name="email" />
         </button>
       </div>
 
