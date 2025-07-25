@@ -98,7 +98,7 @@ const QuoteSlideshow = () => {
     <div className="slideshow">
       <div
         className="slideshow__background"
-        style={{ backgroundImage: `url(/public/${currentBgImage})` }}
+        style={{ backgroundImage: `url(/${currentBgImage})` }}
         key={currentBgImage}
       />
 
