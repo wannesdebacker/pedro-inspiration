@@ -4,7 +4,7 @@ import data from './data/data.ts';
 import Icon from './components/Icon.tsx';
 
 const QuoteSlideshow = () => {
-  const SLIDE_DURATION = 15000;
+  const SLIDE_DURATION = 25000;
   const BACKGROUND_CHANGE_DURATION = 10 * 60 * 1000;
 
   const BACKGROUND_IMAGES = useMemo(
